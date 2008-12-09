@@ -37,11 +37,16 @@ class InlineHistoryPlugin extends MantisPlugin {
 	function hooks() {
 		$hooks = array();
 
+		$hooks['EVENT_LAYOUT_RESOURCES'] = 'css';
 		$hooks['EVENT_VIEW_BUGNOTES_START'] = 'bugnote_start';
 		$hooks['EVENT_VIEW_BUGNOTE'] = 'bugnote';
 		$hooks['EVENT_VIEW_BUGNOTES_END'] = 'bugnote_end';
 
 		return $hooks;
+	}
+
+	function css() {
+		return '<link rel="stylesheet" type="text/css" href="' . plugin_file( 'style.css' ) . '"/>';
 	}
 
 	/**
@@ -104,13 +109,13 @@ class InlineHistoryPlugin extends MantisPlugin {
 			}
 
 			echo '<tr class="row-', $t_class, '">',
-				'<td colspan="2"><span style="width: 35%; float: left">',
-					'<span class="small" style="width: 50%; float: left">', $t_item['date'], '</span>',
-					'<span class="small" style="width: 50%; float: right">', print_user( $t_item['userid'] ), '</span>',
+				'<td colspan="2"><span class="IHleft">',
+					'<span class="IHdate">', $t_item['date'], '</span>',
+					'<span class="IHuser">', print_user( $t_item['userid'] ), '</span>',
 				'</span>',
-				'<span class="small" style="width: 65%; float: right">',
-					'<span class="small" style="width: 45%; float: left">', string_display( $t_item['note'] ), '</span>',
-					'<span class="small" style="width: 55%; float: right">', string_display_line_links( $t_item['change'] ), '</span>',
+				'<span class="IHright">',
+					'<span class="IHfield">', string_display( $t_item['note'] ), '</span>',
+					'<span class="IHchange">', string_display_line_links( $t_item['change'] ), '</span>',
 				'</span></td></tr>';
 
 			$t_last_date = $t_item['date'];
