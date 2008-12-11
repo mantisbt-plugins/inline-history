@@ -57,6 +57,8 @@ class InlineHistoryPlugin extends MantisPlugin {
 	 * @param array Bug note objects
 	 */
 	function bugnote_start( $p_event, $p_bug_id, $p_bugnotes ) {
+		$this->order = ( 'ASC' == current_user_get_pref( 'bugnote_order' ) );
+
 		$t_normal_date_format = config_get( 'normal_date_format' );
 
 		$this->history = array();
@@ -135,12 +137,23 @@ class InlineHistoryPlugin extends MantisPlugin {
 	function next_entries( $p_bugnote_id=-1 ) {
 		if ( $p_bugnote_id >= 0 && isset( $this->bugnote_times[ $p_bugnote_id ] ) ) {
 			$t_note_time = $this->bugnote_times[ $p_bugnote_id ];
+			$t_count = count( $this->history );
 
 			$t_entries = array();
-			while( count( $this->history ) > 0 &&
-				$this->history[0]['date'] < $t_note_time ) {
 
-				$t_entries[] = array_shift( $this->history );
+			if ( $this->order ) {
+				while( $t_count > 0 &&
+					$this->history[0]['date'] < $t_note_time ) {
+
+					$t_entries[] = array_shift( $this->history );
+				}
+			} else {
+				$i = 1;
+				while( $t_count > 0 &&
+					$this->history[$t_count - $i++]['date'] >= $t_note_time ) {
+
+					$t_entries[] = array_pop( $this->history );
+				}
 			}
 		} else {
 			$t_entries = $this->history;
