@@ -17,6 +17,7 @@
  * @author John Reese
  */
 class InlineHistoryPlugin extends MantisPlugin {
+
 	function register() {
 		$this->name = plugin_lang_get( 'title' );
 		$this->description = plugin_lang_get( 'description' );
@@ -31,6 +32,12 @@ class InlineHistoryPlugin extends MantisPlugin {
 		$this->url = 'http://leetcode.net';
 	}
 
+	function config() {
+		return array(
+			'default_enabled' => ON,
+		);
+	}
+
 	/**
 	 * Hook the bugnote viewing events.
 	 */
@@ -41,12 +48,92 @@ class InlineHistoryPlugin extends MantisPlugin {
 		$hooks['EVENT_VIEW_BUGNOTES_START'] = 'bugnote_start';
 		$hooks['EVENT_VIEW_BUGNOTE'] = 'bugnote';
 		$hooks['EVENT_VIEW_BUGNOTES_END'] = 'bugnote_end';
+		$hooks['EVENT_ACCOUNT_PREF_UPDATE_FORM'] = 'user_pref_update_form';
+		$hooks['EVENT_ACCOUNT_PREF_UPDATE'] = 'user_pref_update';
 
 		return $hooks;
 	}
 
 	function css() {
 		return '<link rel="stylesheet" type="text/css" href="' . plugin_file( 'style.css' ) . '"/>';
+	}
+
+	/**
+	 * Checks the database to see if user wants to view inline history.
+	 * @param int User ID
+	 * @return boolean Inline history is selected for the user
+	 */
+	function user_inline_view_enabled( $p_user_id=null ) {
+
+		static $s_enabled = array();
+
+		if( is_null( $p_user_id ) ) {
+			$p_user_id = auth_get_current_user_id();
+		}
+
+		if( !isset( $s_enabled[ $p_user_id ] ) ){
+			$t_user_table = plugin_table( 'user' );
+
+			$t_query = "SELECT * FROM $t_user_table
+						WHERE user_id=" . db_param();
+			$t_result = db_query_bound( $t_query, array( $p_user_id ) );
+
+			if ( db_num_rows ( $t_result ) < 1 ) {
+				$s_enabled[ $p_user_id ] = plugin_config_get( 'default_enabled' );
+
+				$t_query = "INSERT INTO $t_user_table
+							( user_id, enabled )
+							VALUES ( " . db_param() . ', ' . db_param() . ' )';
+				db_query_bound ( $t_query, array( $p_user_id, $s_enabled[ $p_user_id ] ) );
+
+			} else {
+				$t_row = db_fetch_array( $t_result );
+				$s_enabled[ $p_user_id ] = $t_row['enabled'];
+			}
+		}
+
+		return $s_enabled[ $p_user_id ];
+	}
+
+	/**
+	 * Adds a row to the user preference page to enable or
+	 * disable inline history entries.
+	 * @param string Event name
+	 * @param int User ID
+	 */
+	function user_pref_update_form( $p_event, $p_user_id ) {
+
+		if ( $this->user_inline_view_enabled( $p_user_id ) ){
+			$t_checked = ' checked="checked"';
+		}
+
+		echo '<tr ', helper_alternate_class(), '><td class="category">',
+			plugin_lang_get( 'view_inline_history' ),
+			'<input type="hidden" name="inline_history" value="1"/>',
+			'</td><td><input type="checkbox" name="inline_history_enabled"',
+			$t_checked, '/></td></tr>';
+	}
+
+	/**
+	 * Update the user preference in the database from the form
+	 * @param string Event name
+	 * @param int User ID
+	 */
+	function user_pref_update( $p_event, $p_user_id ) {
+
+		$t_user_table = plugin_table( 'user' );
+
+		$f_set = gpc_get_int( 'inline_history', 0 );
+		$f_enabled = gpc_get_bool( 'inline_history_enabled', 0 );
+
+		if ( !$f_set ) {
+			return;
+		}
+
+		$t_query = "UPDATE $t_user_table
+					SET enabled=" . db_param() .
+					" WHERE user_id=" . db_param();
+		db_query_bound( $t_query, array( $f_enabled, $p_user_id ) );
 	}
 
 	/**
@@ -57,6 +144,10 @@ class InlineHistoryPlugin extends MantisPlugin {
 	 * @param array Bug note objects
 	 */
 	function bugnote_start( $p_event, $p_bug_id, $p_bugnotes ) {
+		if( !$this->user_inline_view_enabled() ){
+			return;
+		}
+
 		$this->order = ( 'ASC' == current_user_get_pref( 'bugnote_order' ) );
 
 		$t_normal_date_format = config_get( 'normal_date_format' );
@@ -86,6 +177,10 @@ class InlineHistoryPlugin extends MantisPlugin {
 	 * @param boolean Private bugnote
 	 */
 	function bugnote( $p_event, $p_bug_id, $p_bugnote_id, $p_private ) {
+		if( !$this->user_inline_view_enabled() ){
+			return;
+		}
+
 		$this->display_entries( $p_bugnote_id );
 	}
 
@@ -161,6 +256,19 @@ class InlineHistoryPlugin extends MantisPlugin {
 		}
 
 		return $t_entries;
+	}
+
+	/**
+	 * Database schema for plugin data.
+	 */
+	function schema() {
+		return array(
+			# 2009-03-20
+			array( 'CreateTableSQL', array( plugin_table( 'user' ), "
+				user_id		I		NOTNULL UNSIGNED PRIMARY,
+				enabled		L		NOTNULL DEFAULT '0'
+				" ) ),
+		);
 	}
 }
 

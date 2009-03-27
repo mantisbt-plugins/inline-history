@@ -15,4 +15,7 @@ $s_plugin_InlineHistory_ = '';
 $s_plugin_InlineHistory_title = 'Inline History Viewer';
 $s_plugin_InlineHistory_description = 'Allows users to view history entries intermixed with bugnotes.';
 
+$s_plugin_InlineHistory_view_inline_history = 'View Inline History';
+
 $s_bug_notes_title = 'Notes and Issue History';
+
