@@ -15,4 +15,6 @@ $s_plugin_InlineHistory_ = '';
 $s_plugin_InlineHistory_title = 'Просмотр истории с комментариями';
 $s_plugin_InlineHistory_description = 'Позволяет видеть историю задачи в списке с комментариями в том порядке в котором все происходило.';
 
+$s_plugin_InlineHistory_view_inline_history = 'Показывать Историю в комментариях';
+
 $s_bug_notes_title = 'История событий и комментариев.';
