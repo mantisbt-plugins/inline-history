@@ -47,7 +47,6 @@ class InlineHistoryPlugin extends MantisPlugin {
 		$hooks['EVENT_LAYOUT_RESOURCES'] = 'css';
 		$hooks['EVENT_VIEW_BUGNOTES_START'] = 'bugnote_start';
 		$hooks['EVENT_VIEW_BUGNOTE'] = 'bugnote';
-		$hooks['EVENT_VIEW_BUGNOTES_END'] = 'bugnote_end';
 		$hooks['EVENT_ACCOUNT_PREF_UPDATE_FORM'] = 'user_pref_update_form';
 		$hooks['EVENT_ACCOUNT_PREF_UPDATE'] = 'user_pref_update';
 
