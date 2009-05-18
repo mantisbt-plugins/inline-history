@@ -251,6 +251,11 @@ class InlineHistoryPlugin extends MantisPlugin {
 			}
 		} else {
 			$t_entries = $this->history;
+
+			if ( !$this->order ) {
+				$t_entries = array_reverse( $t_entries );
+			}
+
 			$this->history = array();
 		}
 
