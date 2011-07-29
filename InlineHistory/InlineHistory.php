@@ -162,7 +162,7 @@ class InlineHistoryPlugin extends MantisPlugin {
 
 		$t_access_level_needed = config_get( 'view_history_threshold' );
 		if ( access_has_bug_level( $t_access_level_needed, $p_bug_id ) ) {
-			$this->history = history_get_events_array( $p_bug_id );
+			$this->history = array_filter(history_get_events_array( $p_bug_id ), 'InlineHistory_Filter_Entries');
 		}
 
 		$this->display_entries(0);
@@ -276,3 +276,12 @@ class InlineHistoryPlugin extends MantisPlugin {
 	}
 }
 
+/**
+ * Filter out history entries for "Note Added".
+ *
+ * @param History entry
+ * @return True if entry not "Note Added: xyz"
+ */
+function InlineHistory_Filter_Entries( $p_entry ) {
+	return (stristr($p_entry['note'], 'Note Added:') != $p_entry['note']);
+}
