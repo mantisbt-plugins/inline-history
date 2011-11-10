@@ -289,5 +289,5 @@ class InlineHistoryPlugin extends MantisPlugin {
  * @return True if entry not "Note Added: xyz"
  */
 function InlineHistory_Filter_Entries( $p_entry ) {
-	return (stristr($p_entry['note'], 'Note Added:') != $p_entry['note']);
+	return (stristr($p_entry['note'], lang_get( 'bugnote_added' ).':') != $p_entry['note']);
 }
