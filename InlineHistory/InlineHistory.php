@@ -211,7 +211,7 @@ class InlineHistoryPlugin extends MantisPlugin {
 				'</span>',
 				'<span class="IHright">',
 					'<span class="IHfield">', string_display( $t_item['note'] ), '</span>',
-					'<span class="IHchange">', string_display_line_links( $t_item['change'] ), '</span>',
+					'<span class="IHchange">', $t_item['change'], '</span>',
 				'</span></td></tr>';
 
 			$t_last_date = $t_item['date'];
