@@ -237,6 +237,7 @@ class InlineHistoryPlugin extends MantisPlugin {
 
 			if ( $this->order ) {
 				while( $t_count > 0 &&
+					is_array( $this->history[0] ) &&
 					$this->history[0]['date'] < $t_note_time ) {
 
 					$t_entries[] = array_shift( $this->history );
