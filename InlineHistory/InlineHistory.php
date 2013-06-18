@@ -162,7 +162,14 @@ class InlineHistoryPlugin extends MantisPlugin {
 
 		$t_access_level_needed = config_get( 'view_history_threshold' );
 		if ( access_has_bug_level( $t_access_level_needed, $p_bug_id ) ) {
-			$this->history = array_filter(history_get_events_array( $p_bug_id ), 'InlineHistory_Filter_Entries');
+			$t_history = array_filter( history_get_events_array( $p_bug_id ), 'InlineHistory_Filter_Entries');
+			# The array comes from the database sorted according to history_order
+			# If this is not the same as bugnote_order we need to reverse the history array
+			if( config_get( 'history_order' ) === current_user_get_pref( 'bugnote_order' ) ) {
+				$this->history = $t_history;
+			} else {
+				$this->history = array_reverse( $t_history );
+			}
 		}
 
 		$this->display_entries(0);
@@ -231,31 +238,18 @@ class InlineHistoryPlugin extends MantisPlugin {
 	function next_entries( $p_bugnote_id=-1 ) {
 		if ( $p_bugnote_id >= 0 && isset( $this->bugnote_times[ $p_bugnote_id ] ) ) {
 			$t_note_time = $this->bugnote_times[ $p_bugnote_id ];
-			$t_count = count( $this->history );
-
 			$t_entries = array();
-
 			if ( $this->order ) {
-				while( $t_count > 0 &&
-					$this->history[0]['date'] < $t_note_time ) {
-
+				while( $this->history[0] !== NULL && $this->history[0]['date'] < $t_note_time ) {
 					$t_entries[] = array_shift( $this->history );
-					$t_count = count( $this->history );
 				}
 			} else {
-				while( $t_count > 0 &&
-					$this->history[$t_count - 1]['date'] >= $t_note_time ) {
-					$t_entries[] = array_pop( $this->history );
-					$t_count = count( $this->history );
+				while( $this->history[0] !== NULL && $this->history[0]['date'] >= $t_note_time ) {
+					$t_entries[] = array_shift( $this->history );
 				}
 			}
 		} else {
 			$t_entries = $this->history;
-
-			if ( !$this->order ) {
-				$t_entries = array_reverse( $t_entries );
-			}
-
 			$this->history = array();
 		}
 		return $t_entries;
