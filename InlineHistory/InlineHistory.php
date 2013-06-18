@@ -240,13 +240,13 @@ class InlineHistoryPlugin extends MantisPlugin {
 					$this->history[0]['date'] < $t_note_time ) {
 
 					$t_entries[] = array_shift( $this->history );
+					$t_count = count( $this->history );
 				}
 			} else {
-				$i = 1;
 				while( $t_count > 0 &&
-					$this->history[$t_count - $i++]['date'] >= $t_note_time ) {
-
+					$this->history[$t_count - 1]['date'] >= $t_note_time ) {
 					$t_entries[] = array_pop( $this->history );
+					$t_count = count( $this->history );
 				}
 			}
 		} else {
@@ -258,7 +258,6 @@ class InlineHistoryPlugin extends MantisPlugin {
 
 			$this->history = array();
 		}
-
 		return $t_entries;
 	}
 
