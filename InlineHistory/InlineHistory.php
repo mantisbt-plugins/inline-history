@@ -228,6 +228,24 @@ class InlineHistoryPlugin extends MantisPlugin {
 			echo '<tr class="spacer"><td colspan="2"></td></tr>';
 		}
 	}
+	
+	/**
+	* Check if the note time is before the current history items
+	* or if we need to look further.
+	* @param date Time of next note to be displayed
+	* @return true if current history item needs to be displayed before the next note
+	*/
+	private function need_next( $p_note_time ) {
+		if ( !isset( $this->history[0] ) ) {
+			return false;
+		}
+		$t_need_next = $this->history[0]['date'] < $p_note_time;
+		if ( $this->order ) {
+			return $t_need_next;
+		} else {
+			return !$t_need_next;
+		}
+	}
 
 	/**
 	 * Generate a list of remaining history entries that occurred before
@@ -239,14 +257,9 @@ class InlineHistoryPlugin extends MantisPlugin {
 		if ( $p_bugnote_id >= 0 && isset( $this->bugnote_times[ $p_bugnote_id ] ) ) {
 			$t_note_time = $this->bugnote_times[ $p_bugnote_id ];
 			$t_entries = array();
-			if ( $this->order ) {
-				while( $this->history[0] !== NULL && $this->history[0]['date'] < $t_note_time ) {
-					$t_entries[] = array_shift( $this->history );
-				}
-			} else {
-				while( $this->history[0] !== NULL && $this->history[0]['date'] >= $t_note_time ) {
-					$t_entries[] = array_shift( $this->history );
-				}
+			# Shift all entries the need to go before the current bugnote
+			while( $this->need_next( $t_note_time ) ) {
+				$t_entries[] = array_shift( $this->history );
 			}
 		} else {
 			$t_entries = $this->history;
