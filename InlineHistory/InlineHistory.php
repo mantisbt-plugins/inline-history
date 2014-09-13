@@ -102,15 +102,12 @@ class InlineHistoryPlugin extends MantisPlugin {
 	 */
 	function user_pref_update_form( $p_event, $p_user_id ) {
 
-		if ( $this->user_inline_view_enabled( $p_user_id ) ){
-			$t_checked = ' checked="checked"';
-		}
-
 		echo '<tr ', helper_alternate_class(), '><td class="category">',
 			plugin_lang_get( 'view_inline_history' ),
 			'<input type="hidden" name="inline_history" value="1"/>',
-			'</td><td><input type="checkbox" name="inline_history_enabled"',
-			$t_checked, '/></td></tr>';
+			'</td><td><input type="checkbox" name="inline_history_enabled"';
+		check_checked( $this->user_inline_view_enabled( $p_user_id ) );
+		echo '/></td></tr>';
 	}
 
 	/**
@@ -228,7 +225,7 @@ class InlineHistoryPlugin extends MantisPlugin {
 			echo '<tr class="spacer"><td colspan="2"></td></tr>';
 		}
 	}
-	
+
 	/**
 	* Check if the note time is before the current history items
 	* or if we need to look further.
