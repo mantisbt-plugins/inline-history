@@ -159,17 +159,39 @@ class InlineHistoryPlugin extends MantisPlugin {
 
 		$t_access_level_needed = config_get( 'view_history_threshold' );
 		if ( access_has_bug_level( $t_access_level_needed, $p_bug_id ) ) {
-			$t_history = array_filter( history_get_events_array( $p_bug_id ), 'InlineHistory_Filter_Entries');
+			$this->history = $this->history_get_events_array( $p_bug_id );
 			# The array comes from the database sorted according to history_order
 			# If this is not the same as bugnote_order we need to reverse the history array
-			if( config_get( 'history_order' ) === current_user_get_pref( 'bugnote_order' ) ) {
-				$this->history = $t_history;
-			} else {
-				$this->history = array_reverse( $t_history );
-			}
+			if( config_get( 'history_order' ) !== current_user_get_pref( 'bugnote_order' ) )
+				$this->history = array_reverse( $this->history );
 		}
 
 		$this->display_entries(0);
+	}
+
+	/**
+	 * Retrieves the history events for the specified bug id.
+	 * @param int $p_bug_id
+	 * @param int $p_user_id
+	 * @return array
+	 */
+	function history_get_events_array( $p_bug_id, $p_user_id = null ) {
+		$t_normal_date_format = config_get( 'normal_date_format' );
+
+		$raw_history = history_get_raw_events_array( $p_bug_id, $p_user_id );
+		$raw_history_count = count( $raw_history );
+		$history = array();
+
+		for( $i = 0;$i < $raw_history_count;$i++ ) {
+			if( BUGNOTE_ADDED == $raw_history[$i]['type'] ) continue;
+
+			$history[$i] = history_localize_item( $raw_history[$i]['field'], $raw_history[$i]['type'], $raw_history[$i]['old_value'], $raw_history[$i]['new_value'] );
+			$history[$i]['date'] = date( $t_normal_date_format, $raw_history[$i]['date'] );
+			$history[$i]['userid'] = $raw_history[$i]['userid'];
+			$history[$i]['username'] = $raw_history[$i]['username'];
+		}
+
+		return( $history );
 	}
 
 	/**
@@ -279,12 +301,3 @@ class InlineHistoryPlugin extends MantisPlugin {
 	}
 }
 
-/**
- * Filter out history entries for "Note Added".
- *
- * @param History entry
- * @return True if entry not "Note Added: xyz"
- */
-function InlineHistory_Filter_Entries( $p_entry ) {
-	return (stristr($p_entry['note'], lang_get( 'bugnote_added' ).':') != $p_entry['note']);
-}
