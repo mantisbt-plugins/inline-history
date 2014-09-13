@@ -29,9 +29,9 @@ The plugin requires [Mantis](http://www.mantisbt.org/) version 1.2.0 or higher
 
 ## Usage
 
-### Disabling the plugin at user level
+Just navigate to the *View Issue Details* page for any issue.
 
-Individual users have the possibility disabling the plugin by unchecking the
+Individual users have the possibility of disabling the plugin by unchecking the
 relevant option in their preferences (*My Account -> Preferences*)
 
 
