@@ -162,7 +162,14 @@ class InlineHistoryPlugin extends MantisPlugin {
 
 		$t_access_level_needed = config_get( 'view_history_threshold' );
 		if ( access_has_bug_level( $t_access_level_needed, $p_bug_id ) ) {
-			$this->history = array_filter(history_get_events_array( $p_bug_id ), 'InlineHistory_Filter_Entries');
+			$t_history = array_filter( history_get_events_array( $p_bug_id ), 'InlineHistory_Filter_Entries');
+			# The array comes from the database sorted according to history_order
+			# If this is not the same as bugnote_order we need to reverse the history array
+			if( config_get( 'history_order' ) === current_user_get_pref( 'bugnote_order' ) ) {
+				$this->history = $t_history;
+			} else {
+				$this->history = array_reverse( $t_history );
+			}
 		}
 
 		$this->display_entries(0);
@@ -221,6 +228,24 @@ class InlineHistoryPlugin extends MantisPlugin {
 			echo '<tr class="spacer"><td colspan="2"></td></tr>';
 		}
 	}
+	
+	/**
+	* Check if the note time is before the current history items
+	* or if we need to look further.
+	* @param date Time of next note to be displayed
+	* @return true if current history item needs to be displayed before the next note
+	*/
+	private function need_next( $p_note_time ) {
+		if ( !isset( $this->history[0] ) ) {
+			return false;
+		}
+		$t_need_next = $this->history[0]['date'] < $p_note_time;
+		if ( $this->order ) {
+			return $t_need_next;
+		} else {
+			return !$t_need_next;
+		}
+	}
 
 	/**
 	 * Generate a list of remaining history entries that occurred before
@@ -231,34 +256,15 @@ class InlineHistoryPlugin extends MantisPlugin {
 	function next_entries( $p_bugnote_id=-1 ) {
 		if ( $p_bugnote_id >= 0 && isset( $this->bugnote_times[ $p_bugnote_id ] ) ) {
 			$t_note_time = $this->bugnote_times[ $p_bugnote_id ];
-			$t_count = count( $this->history );
-
 			$t_entries = array();
-
-			if ( $this->order ) {
-				while( $t_count > 0 &&
-					$this->history[0]['date'] < $t_note_time ) {
-
-					$t_entries[] = array_shift( $this->history );
-				}
-			} else {
-				$i = 1;
-				while( $t_count > 0 &&
-					$this->history[$t_count - $i++]['date'] >= $t_note_time ) {
-
-					$t_entries[] = array_pop( $this->history );
-				}
+			# Shift all entries the need to go before the current bugnote
+			while( $this->need_next( $t_note_time ) ) {
+				$t_entries[] = array_shift( $this->history );
 			}
 		} else {
 			$t_entries = $this->history;
-
-			if ( !$this->order ) {
-				$t_entries = array_reverse( $t_entries );
-			}
-
 			$this->history = array();
 		}
-
 		return $t_entries;
 	}
 
