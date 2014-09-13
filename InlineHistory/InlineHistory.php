@@ -27,9 +27,9 @@ class InlineHistoryPlugin extends MantisPlugin {
 			'MantisCore' => '1.2.0',
 		);
 
-		$this->author = 'John Reese';
-		$this->contact = 'jreese@leetcode.net';
-		$this->url = 'http://leetcode.net';
+		$this->author = 'John Reese, MantisBT team';
+		$this->contact = 'mantisbt-dev@lists.sourceforge.net';
+		$this->url = 'https://github.com/mantisbt-plugins/inline-history';
 	}
 
 	function config() {
