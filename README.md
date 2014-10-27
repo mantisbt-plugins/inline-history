@@ -29,10 +29,15 @@ The plugin requires [Mantis](http://www.mantisbt.org/) version 1.2.0 or higher
 
 ## Usage
 
-Just navigate to the *View Issue Details* page for any issue.
+Just navigate to the *View Issue Details* page for any issue to view inline
+history.
 
-Individual users have the possibility of disabling the plugin by unchecking the
-relevant option in their preferences (*My Account -> Preferences*)
+
+### Disabling the plugin at user level
+
+Individual users have the possibility of disabling the plugin (i.e. revert to
+standard MantisBT behavior) by unchecking the relevant option in their
+preferences (*My Account -> Preferences*).
 
 
 ## Support
