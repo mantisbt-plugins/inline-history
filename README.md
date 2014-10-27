@@ -1,6 +1,6 @@
 # Inline History Viewer plugin for MantisBT
 
-Copyright (c) 2008 - 2012  John Reese - http://noswap.com
+Copyright (c) 2008 - 2012  John Reese - http://noswap.com  
 Copyright (c) 2012 - 2014  MantisBT Team - mantisbt-dev@lists.sourceforge.net
 
 Released under the [GPLv3 license](http://opensource.org/licenses/GPL-3.0)
