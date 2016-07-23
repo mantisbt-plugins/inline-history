@@ -24,7 +24,7 @@ class InlineHistoryPlugin extends MantisPlugin {
 
 		$this->version = '0.1';
 		$this->requires = array(
-			'MantisCore' => '1.2.0',
+			'MantisCore' => '1.3.0',
 		);
 
 		$this->author = 'John Reese, MantisBT team';
@@ -75,7 +75,7 @@ class InlineHistoryPlugin extends MantisPlugin {
 
 			$t_query = "SELECT * FROM $t_user_table
 						WHERE user_id=" . db_param();
-			$t_result = db_query_bound( $t_query, array( $p_user_id ) );
+			$t_result = db_query( $t_query, array( $p_user_id ) );
 
 			if ( db_num_rows ( $t_result ) < 1 ) {
 				$s_enabled[ $p_user_id ] = plugin_config_get( 'default_enabled' );
@@ -101,13 +101,14 @@ class InlineHistoryPlugin extends MantisPlugin {
 	 * @param int User ID
 	 */
 	function user_pref_update_form( $p_event, $p_user_id ) {
-
-		echo '<tr ', helper_alternate_class(), '><td class="category">',
-			plugin_lang_get( 'view_inline_history' ),
-			'<input type="hidden" name="inline_history" value="1"/>',
-			'</td><td><input type="checkbox" name="inline_history_enabled"';
-		check_checked( $this->user_inline_view_enabled( $p_user_id ) );
-		echo '/></td></tr>';
+		echo '<div class="field-container">'
+			. '<label for="view_inline_history"><span>' . plugin_lang_get( 'view_inline_history' ) . '</span></label>'
+			. '<span class="input"><input type="hidden" name="inline_history" value="1"/>'
+			. '<input type="checkbox" name="inline_history_enabled"';
+		check_checked( (int)$this->user_inline_view_enabled( $p_user_id ), ON );
+		echo '/></span>'
+			. '<span class="label-style"></span>'
+			. '</div>';
 	}
 
 	/**
@@ -129,7 +130,7 @@ class InlineHistoryPlugin extends MantisPlugin {
 		$t_query = "UPDATE $t_user_table
 					SET enabled=" . db_param() .
 					" WHERE user_id=" . db_param();
-		db_query_bound( $t_query, array( $f_enabled, $p_user_id ) );
+		db_query( $t_query, array( $f_enabled, $p_user_id ) );
 	}
 
 	/**
