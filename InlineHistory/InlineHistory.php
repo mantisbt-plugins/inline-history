@@ -24,7 +24,7 @@ class InlineHistoryPlugin extends MantisPlugin {
 
 		$this->version = '0.1';
 		$this->requires = array(
-			'MantisCore' => '1.2.0',
+			'MantisCore' => '2.0.0',
 		);
 
 		$this->author = 'John Reese, MantisBT team';
