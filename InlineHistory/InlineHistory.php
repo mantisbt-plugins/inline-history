@@ -236,7 +236,9 @@ class InlineHistoryPlugin extends MantisPlugin {
 		if ( !isset( $this->history[0] ) ) {
 			return false;
 		}
-		$t_need_next = $this->history[0]['date'] < $p_note_time;
+
+		$t_need_next = strtotime($this->history[0]['date']) < strtotime($p_note_time);
+
 		if ( $this->order ) {
 			return $t_need_next;
 		} else {
