@@ -24,7 +24,7 @@ class InlineHistoryPlugin extends MantisPlugin {
 
 		$this->version = '0.1';
 		$this->requires = array(
-			'MantisCore' => '1.2.0',
+			'MantisCore' => '2.0.0',
 		);
 
 		$this->author = 'John Reese, MantisBT team';
@@ -106,7 +106,7 @@ class InlineHistoryPlugin extends MantisPlugin {
 			plugin_lang_get( 'view_inline_history' ),
 			'<input type="hidden" name="inline_history" value="1"/>',
 			'</td><td><input type="checkbox" name="inline_history_enabled"';
-		check_checked( $this->user_inline_view_enabled( $p_user_id ) );
+		check_checked( boolval($this->user_inline_view_enabled( $p_user_id )) );
 		echo '/></td></tr>';
 	}
 
@@ -236,7 +236,9 @@ class InlineHistoryPlugin extends MantisPlugin {
 		if ( !isset( $this->history[0] ) ) {
 			return false;
 		}
-		$t_need_next = $this->history[0]['date'] < $p_note_time;
+
+		$t_need_next = strtotime($this->history[0]['date']) < strtotime($p_note_time);
+
 		if ( $this->order ) {
 			return $t_need_next;
 		} else {
