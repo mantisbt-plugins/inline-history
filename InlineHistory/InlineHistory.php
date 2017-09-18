@@ -106,7 +106,7 @@ class InlineHistoryPlugin extends MantisPlugin {
 			plugin_lang_get( 'view_inline_history' ),
 			'<input type="hidden" name="inline_history" value="1"/>',
 			'</td><td><input type="checkbox" name="inline_history_enabled"';
-		check_checked( $this->user_inline_view_enabled( $p_user_id ) );
+		check_checked( boolval($this->user_inline_view_enabled( $p_user_id )) );
 		echo '/></td></tr>';
 	}
 
